@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<container>
+    <object name="saving" class="Bank">
+        <injector name="id" value="1001"/>
+        <injector name="name" value="Mao"/>
+        <injector name="amount" value="5678"/>
+    </object>
+
+    <object name="current" class="Bank">
+        <injector name="id" type="set" value="1002"/>
+        <injector name="name" type="set" value="Chao"/>
+        <injector name="amount" type="set" value="1234"/>
+    </object>
+
+    <object name="user" class="User">
+        <injector name="bank" ref="saving"/>
+    </object>
+</container>
