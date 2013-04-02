@@ -1,7 +1,19 @@
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.sun.istack.internal.Nullable;
+import parser.result.Injector;
 import parser.result.Recipe;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.NoSuchElementException;
+
+import static com.google.common.collect.Iterables.find;
+import static com.google.common.collect.Iterables.transform;
 
 public class ReinventedIOC {
     private Cookbook cookbook = new Cookbook();
@@ -25,9 +37,34 @@ public class ReinventedIOC {
         return null;
     }
 
-    private Object createObject(Recipe description) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-        Class klass = Class.forName(description.getKlass());
-        return klass.newInstance();
+    private Object createObject(final Recipe recipe) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+        Class klass = Class.forName(recipe.getKlass());
+
+        Constructor<?>[] constructors = klass.getConstructors();
+        Constructor constructor = find(Lists.newArrayList(constructors), new Predicate<Constructor>() {
+            @Override
+            @Nullable
+            public boolean apply(Constructor o) {
+                int length = o.getParameterTypes().length;
+                return length == recipe.getInjectorNumber();
+            }
+        });
+
+        List<Injector> injectorList = recipe.getInjectorList();
+        Iterable<Object> p = transform(injectorList, new Function<Injector, Object>() {
+            @Override
+            @Nullable
+            public Object apply(Injector injector) {
+                return injector.getValue();
+            }
+        });
+
+        try {
+            return constructor.newInstance(Iterables.toArray(p, Object.class));
+        } catch (InvocationTargetException e) {
+
+        }
+        return null;
     }
 
     public void setCookbook(Cookbook cookbook) {

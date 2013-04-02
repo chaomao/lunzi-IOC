@@ -1,7 +1,11 @@
 import org.junit.Before;
 import org.junit.Test;
+import parser.result.InjectType;
+import parser.result.Injector;
 import parser.result.Recipe;
 import product.Bank;
+
+import java.util.Arrays;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -36,6 +40,27 @@ public class ReinventedIOCTest {
         assertThat(ioc.getObjectNumbers(), is(1));
     }
 
+    @Test
+    public void should_create_object_with_constructor_injector() {
+        Injector injector = getInjector(InjectType.Constructor, "id", 1001, false);
+        Cookbook cookbook = createCookbook(createRecipe("bank", "product.Bank", injector));
+
+        ioc.setCookbook(cookbook);
+
+        Bank bank = (Bank) ioc.lookUp("bank");
+
+        assertThat(bank.getId(), is(1001));
+    }
+
+    private Injector getInjector(InjectType type, String name, int value, boolean isReference) {
+        Injector injector = new Injector();
+        injector.setInjectType(type);
+        injector.setName(name);
+        injector.setValue(value);
+        injector.setIsReference(isReference);
+        return injector;
+    }
+
     private Cookbook createCookbook(Recipe... recipes) {
         Cookbook cookbook = new Cookbook();
         for (Recipe r : recipes) {
@@ -48,6 +73,14 @@ public class ReinventedIOCTest {
         Recipe recipe = new Recipe();
         recipe.setName(name);
         recipe.setKlass(klass);
+        return recipe;
+    }
+
+    private Recipe createRecipe(String name, String klass, Injector... recipeList) {
+        Recipe recipe = new Recipe();
+        recipe.setName(name);
+        recipe.setKlass(klass);
+        recipe.setInjectorList(Arrays.asList(recipeList));
         return recipe;
     }
 }
