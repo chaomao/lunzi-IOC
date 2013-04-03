@@ -1,5 +1,9 @@
 package parser.result;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+import com.sun.istack.internal.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,11 +36,17 @@ public class Recipe {
         this.klass = klass;
     }
 
-    public boolean hasInjector() {
-        return !injectorList.isEmpty();
-    }
-
     public int getInjectorNumber() {
         return injectorList.size();
+    }
+
+    public Iterable<Object> getInjectValues() {
+        return Iterables.transform(injectorList, new Function<Injector, Object>() {
+            @Override
+            @Nullable
+            public Object apply(Injector injector) {
+                return injector.getValue();
+            }
+        });
     }
 }

@@ -1,3 +1,5 @@
+package parser.result;
+
 import com.google.common.base.Predicate;
 import parser.result.Recipe;
 

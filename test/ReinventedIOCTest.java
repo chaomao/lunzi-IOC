@@ -1,5 +1,6 @@
 import org.junit.Before;
 import org.junit.Test;
+import parser.result.Cookbook;
 import parser.result.InjectType;
 import parser.result.Injector;
 import parser.result.Recipe;
@@ -52,7 +53,19 @@ public class ReinventedIOCTest {
         assertThat(bank.getId(), is(1001));
     }
 
-    private Injector getInjector(InjectType type, String name, int value, boolean isReference) {
+    @Test
+    public void should_create_object_with_constructor_determined_by_param_type() {
+        Injector injector = getInjector(InjectType.Constructor, "name", "Bank of Beijing", false);
+        Cookbook cookbook = createCookbook(createRecipe("bank", "product.Bank", injector));
+
+        ioc.setCookbook(cookbook);
+
+        Bank bank = (Bank) ioc.lookUp("bank");
+
+        assertThat(bank.getName(), is("Bank of Beijing"));
+    }
+
+    private Injector getInjector(InjectType type, String name, Object value, boolean isReference) {
         Injector injector = new Injector();
         injector.setInjectType(type);
         injector.setName(name);
