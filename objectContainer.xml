@@ -9,7 +9,7 @@
     <object name="current" class="Bank">
         <injector name="id" type="set" value="1002"/>
         <injector name="name" type="set" value="Chao"/>
-        <injector name="amount" type="set" value="1234"/>
+        <injector name="amountList" type="set" value="1234"/>
     </object>
 
     <object name="user" class="User">

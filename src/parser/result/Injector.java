@@ -4,7 +4,7 @@ public class Injector {
     private String name;
     private InjectType injectType;
     private Object value;
-    private boolean isReference;
+    private ReferenceType referenceType;
 
     public String getName() {
         return name;
@@ -31,11 +31,15 @@ public class Injector {
     }
 
     public boolean getIsReference() {
-        return isReference;
+        return referenceType.equals(ReferenceType.Reference);
     }
 
-    public void setIsReference(boolean isReference) {
-        this.isReference = isReference;
+    public void setIsReference(ReferenceType type) {
+        this.referenceType = type;
+    }
+
+    public boolean isConstructorInjector() {
+        return injectType.equals(InjectType.Constructor);
     }
 }
 

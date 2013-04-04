@@ -1,39 +1,29 @@
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.sun.istack.internal.Nullable;
+import com.sun.xml.internal.ws.util.StringUtils;
 import parser.result.Cookbook;
 import parser.result.Injector;
 import parser.result.Recipe;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
-
-import static com.google.common.collect.Iterables.*;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.NoSuchElementException;
 
 public class ReinventedIOC {
-    public static final HashMap<Class, Class> CLASS_HASH_MAP = new HashMap<Class, Class>();
 
-    static {
-        CLASS_HASH_MAP.put(int.class, Integer.class);
-        CLASS_HASH_MAP.put(double.class, Double.class);
-        CLASS_HASH_MAP.put(float.class, Float.class);
-        CLASS_HASH_MAP.put(boolean.class, Boolean.class);
-        CLASS_HASH_MAP.put(char.class, Character.class);
-    }
-
+    private final ConstructorFinder constructorFinder = new ConstructorFinder();
     private Cookbook cookbook = new Cookbook();
     private HashMap<String, Object> objectMap = new HashMap<String, Object>();
 
     public Object lookUp(String name) {
-        Recipe description = cookbook.findRecipe(name);
+        Recipe recipe = cookbook.findRecipe(name);
         try {
             if (objectMap.containsKey(name)) {
                 return objectMap.get(name);
             } else {
-                Object o = createObject(description);
+                Object o = createObject(recipe);
+                o = populateObject(recipe, o);
                 objectMap.put(name, o);
                 return o;
             }
@@ -41,6 +31,8 @@ public class ReinventedIOC {
         } catch (ClassNotFoundException e) {
         } catch (InstantiationException e) {
         } catch (IllegalAccessException e) {
+        } catch (NoSuchMethodException e) {
+        } catch (InvocationTargetException e) {
         }
         return null;
     }
@@ -48,68 +40,27 @@ public class ReinventedIOC {
     private Object createObject(final Recipe recipe) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         Class klass = Class.forName(recipe.getKlass());
 
-        Constructor<?>[] constructors = klass.getConstructors();
-        Constructor constructor = getSpecificConstructor(recipe, constructors);
+        Constructor constructor = constructorFinder.getSpecificConstructor(recipe, klass.getConstructors());
 
-        List<Injector> injectorList = recipe.getInjectorList();
-        Iterable<Object> p = transform(injectorList, new Function<Injector, Object>() {
-            @Override
-            @Nullable
-            public Object apply(Injector injector) {
-                return injector.getValue();
-            }
-        });
+        Iterable<Object> injectedValues = recipe.getConstructorInjectorValues();
 
         try {
-            return constructor.newInstance(Iterables.toArray(p, Object.class));
+            return constructor.newInstance(Iterables.toArray(injectedValues, Object.class));
         } catch (InvocationTargetException e) {
 
         }
         return null;
     }
 
-    private Constructor getSpecificConstructor(final Recipe recipe, Constructor<?>[] constructors) {
+    private Object populateObject(Recipe recipe, Object o) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Iterable<Injector> injectors = recipe.getSetterInjectors();
+        for (Injector injector : injectors) {
+            String setterName = "set" + StringUtils.capitalize(injector.getName());
+            Method setter = o.getClass().getDeclaredMethod(setterName, injector.getValue().getClass());
+            setter.invoke(o, injector.getValue());
+        }
 
-        ArrayList<Constructor<?>> constructorList = Lists.newArrayList(constructors);
-        Iterable<Constructor<?>> filteredConstructor = filter(constructorList, new Predicate<Constructor<?>>() {
-            @Override
-            @Nullable
-            public boolean apply(Constructor<?> constructor) {
-                return recipe.getInjectorNumber() == constructor.getParameterTypes().length;
-            }
-        });
-
-        return find(filteredConstructor, new Predicate<Constructor>() {
-            @Override
-            @Nullable
-            public boolean apply(Constructor constructor) {
-                ArrayList<Class> parameterClasses = Lists.newArrayList(getWrapperClasses(constructor));
-                Iterable<Object> injectValues = recipe.getInjectValues();
-
-
-                int index = 0;
-                boolean result = true;
-                for (Object value : injectValues) {
-                    if (!parameterClasses.get(index++).isInstance(value)) {
-                        result = false;
-                        break;
-                    }
-                }
-                return result;
-            }
-        });
-    }
-
-    private Iterable<Class> getWrapperClasses(Constructor constructor) {
-        Class<?>[] types = constructor.getParameterTypes();
-
-        return Iterables.transform(Arrays.asList(types), new Function<Class<?>, Class>() {
-            @Override
-            @Nullable
-            public Class apply(Class<?> klass) {
-                return CLASS_HASH_MAP.containsKey(klass) ? CLASS_HASH_MAP.get(klass) : klass;
-            }
-        });
+        return o;
     }
 
     public void setCookbook(Cookbook cookbook) {

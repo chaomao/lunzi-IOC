@@ -1,11 +1,13 @@
 package parser.result;
 
 import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
+import com.google.common.base.Predicate;
 import com.sun.istack.internal.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.google.common.collect.Iterables.*;
 
 public class Recipe {
     private String name;
@@ -36,12 +38,24 @@ public class Recipe {
         this.klass = klass;
     }
 
-    public int getInjectorNumber() {
-        return injectorList.size();
+    public int getConstructorInjectorCount() {
+        return size(filter(injectorList, new Predicate<Injector>() {
+            @Override
+            @Nullable
+            public boolean apply(Injector injector) {
+                return injector.isConstructorInjector();
+            }
+        }));
     }
 
-    public Iterable<Object> getInjectValues() {
-        return Iterables.transform(injectorList, new Function<Injector, Object>() {
+    public Iterable<Object> getConstructorInjectorValues() {
+        return transform(filter(injectorList, new Predicate<Injector>() {
+            @Override
+            @Nullable
+            public boolean apply(Injector injector) {
+                return injector.isConstructorInjector();
+            }
+        }), new Function<Injector, Object>() {
             @Override
             @Nullable
             public Object apply(Injector injector) {
@@ -49,4 +63,15 @@ public class Recipe {
             }
         });
     }
+
+    public Iterable<Injector> getSetterInjectors() {
+        return filter(injectorList, new Predicate<Injector>() {
+            @Override
+            @Nullable
+            public boolean apply(Injector injector) {
+                return !injector.isConstructorInjector();
+            }
+        });
+    }
+
 }

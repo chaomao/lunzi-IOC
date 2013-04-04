@@ -5,6 +5,7 @@ public class Bank {
     private int id;
 
     private String name;
+    private int amount;
 
     public Bank() {
 
@@ -28,5 +29,13 @@ public class Bank {
 
     public String getName() {
         return name;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Integer amount) {
+        this.amount = amount;
     }
 }
