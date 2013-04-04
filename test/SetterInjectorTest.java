@@ -5,6 +5,8 @@ import parser.result.Injector;
 import parser.result.ReferenceType;
 import product.Bank;
 
+import java.lang.reflect.InvocationTargetException;
+
 import static helper.TestHelper.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -18,7 +20,7 @@ public class SetterInjectorTest {
     }
 
     @Test
-    public void should_create_object_with_one_setter() {
+    public void should_create_object_with_one_setter() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         Injector injector = getSetterInjector("amount", 123, ReferenceType.Primitivity);
         Cookbook cookbook = createCookbook(createRecipe("bank", "product.Bank", injector));
         ioc.setCookbook(cookbook);

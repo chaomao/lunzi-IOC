@@ -5,8 +5,11 @@ import parser.result.Injector;
 import parser.result.ReferenceType;
 import product.Bank;
 
+import java.lang.reflect.InvocationTargetException;
+
 import static helper.TestHelper.*;
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 public class ConstructorInjectorTest {
@@ -19,7 +22,7 @@ public class ConstructorInjectorTest {
     }
 
     @Test
-    public void should_create_object_given_name_class_only() {
+    public void should_create_object_given_name_class_only() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         Cookbook cookbook = createCookbook(createRecipe("bank", "product.Bank"));
         ioc.setCookbook(cookbook);
 
@@ -29,18 +32,18 @@ public class ConstructorInjectorTest {
     }
 
     @Test
-    public void should_not_create_object_twice_when_object_created() {
+    public void should_not_create_object_twice_when_object_created() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         Cookbook cookbook = createCookbook(createRecipe("bank", "product.Bank"));
         ioc.setCookbook(cookbook);
 
-        ioc.lookUp("bank");
-        ioc.lookUp("bank");
+        Object bank1 = ioc.lookUp("bank");
+        Object bank2 = ioc.lookUp("bank");
 
-        assertThat(ioc.getObjectNumbers(), is(1));
+        assertEquals(bank1, bank2);
     }
 
     @Test
-    public void should_create_object_with_constructor_injector() {
+    public void should_create_object_with_constructor_injector() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         Injector injector = getConstructorInjector("id", 1001, ReferenceType.Primitivity);
         Cookbook cookbook = createCookbook(createRecipe("bank", "product.Bank", injector));
 
@@ -52,7 +55,7 @@ public class ConstructorInjectorTest {
     }
 
     @Test
-    public void should_create_object_with_constructor_determined_by_param_type() {
+    public void should_create_object_with_constructor_determined_by_param_type() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         Injector injector = getConstructorInjector("name", "Bank of Beijing", ReferenceType.Primitivity);
         Cookbook cookbook = createCookbook(createRecipe("bank", "product.Bank", injector));
 
