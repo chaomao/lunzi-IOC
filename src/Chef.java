@@ -10,6 +10,8 @@ import java.lang.reflect.Method;
 
 public class Chef {
 
+    private final ConstructorFinder constructorFinder = new ConstructorFinder();
+
     public Object cook(Recipe recipe) throws InstantiationException, IllegalAccessException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
         Object object = createObject(recipe);
         return populateObject(recipe, object);
@@ -17,7 +19,7 @@ public class Chef {
 
     private Object createObject(final Recipe recipe) throws ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException {
         Class klass = Class.forName(recipe.getKlass());
-        Constructor constructor = new ConstructorFinder().getSpecificConstructor(recipe, klass.getConstructors());
+        Constructor constructor = constructorFinder.getSpecificConstructor(recipe.getConstructorInjectorValues(), klass.getConstructors());
         Iterable<Object> injectedValues = recipe.getConstructorInjectorValues();
         return constructor.newInstance(Iterables.toArray(injectedValues, Object.class));
     }

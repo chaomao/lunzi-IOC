@@ -3,7 +3,6 @@ package finder;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.sun.istack.internal.Nullable;
-import parser.result.Recipe;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
@@ -22,31 +21,29 @@ public class AppropriateParameterPredicate implements Predicate<Constructor> {
         CLASS_HASH_MAP.put(char.class, Character.class);
     }
 
-    private Recipe recipe;
+    private Iterable<Object> constructorValues;
 
-    public AppropriateParameterPredicate(Recipe recipe) {
-        this.recipe = recipe;
+    public AppropriateParameterPredicate(Iterable<Object> constructorValues) {
+        this.constructorValues = constructorValues;
     }
 
     @Override
     @Nullable
-    public boolean apply(Constructor constructor) {
-        Class[] parameterClasses = toArray(getWrapperClasses(constructor), Class.class);
-        Iterable<Object> injectValues = recipe.getConstructorInjectorValues();
-        for (int i = 0; i < parameterClasses.length; i++) {
-            if (!parameterClasses[i].isInstance(get(injectValues, i))) {
+    public boolean apply(final Constructor constructor) {
+        Iterable<Class> parameterClasses = getWrapperParameterClasses(constructor.getParameterTypes());
+        for (int i = 0; i < size(parameterClasses); i++) {
+            if (!get(parameterClasses, i).isInstance(get(constructorValues, i))) {
                 return false;
             }
         }
         return true;
     }
 
-    private Iterable<Class> getWrapperClasses(Constructor constructor) {
-        Class<?>[] types = constructor.getParameterTypes();
-        return transform(Arrays.asList(types), new Function<Class<?>, Class>() {
+    private Iterable<Class> getWrapperParameterClasses(final Class[] parameterTypes) {
+        return transform(Arrays.asList(parameterTypes), new Function<Class, Class>() {
             @Override
             @Nullable
-            public Class apply(Class<?> klass) {
+            public Class apply(Class klass) {
                 return CLASS_HASH_MAP.containsKey(klass) ? CLASS_HASH_MAP.get(klass) : klass;
             }
         });

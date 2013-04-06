@@ -1,4 +1,3 @@
-import finder.ConstructorFinder;
 import parser.result.Cookbook;
 import parser.result.Injector;
 import parser.result.Recipe;
@@ -8,7 +7,6 @@ import java.util.HashMap;
 
 public class ReinventedIOC {
 
-    private final ConstructorFinder constructorFinder = new ConstructorFinder();
     private final Chef chef = new Chef();
     private Cookbook cookbook = new Cookbook();
     private HashMap<String, Object> objectMap = new HashMap<String, Object>();
