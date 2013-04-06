@@ -1,5 +1,6 @@
 import org.junit.Before;
 import org.junit.Test;
+import parser.InjectorBuilder;
 import parser.result.Cookbook;
 import parser.result.Injector;
 import parser.result.ReferenceType;
@@ -21,7 +22,12 @@ public class SetterInjectorTest {
 
     @Test
     public void should_create_object_with_one_setter() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
-        Injector injector = getSetterInjector("amount", 123, ReferenceType.Primitivity);
+        Injector injector = new InjectorBuilder().
+                setterInject().
+                name("amount").
+                value(123).
+                primitiveValue().
+                build();
         Cookbook cookbook = createCookbook(createRecipe("bank", "product.Bank", injector));
         ioc.setCookbook(cookbook);
 
@@ -32,8 +38,19 @@ public class SetterInjectorTest {
 
     @Test
     public void should_create_object_with_one_constructor_and_one_setter() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
-        Injector constructorInjector = getConstructorInjector("name", "Bank of Beijing", ReferenceType.Primitivity);
-        Injector setterInjector = getSetterInjector("amount", 123, ReferenceType.Primitivity);
+        Injector constructorInjector = new InjectorBuilder().
+                constructorInject().
+                name("name").
+                value("Bank of Beijing").
+                primitiveValue().
+                build();
+
+        Injector setterInjector = new InjectorBuilder().
+                setterInject().
+                name("amount").
+                value(123).
+                primitiveValue().
+                build();
         Cookbook cookbook = createCookbook(createRecipe("bank", "product.Bank", setterInjector, constructorInjector));
         ioc.setCookbook(cookbook);
 

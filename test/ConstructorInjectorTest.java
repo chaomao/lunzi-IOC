@@ -1,5 +1,6 @@
 import org.junit.Before;
 import org.junit.Test;
+import parser.InjectorBuilder;
 import parser.result.Cookbook;
 import parser.result.Injector;
 import parser.result.ReferenceType;
@@ -44,7 +45,12 @@ public class ConstructorInjectorTest {
 
     @Test
     public void should_create_object_with_constructor_injector() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
-        Injector injector = getConstructorInjector("id", 1001, ReferenceType.Primitivity);
+        Injector injector = new InjectorBuilder().
+                constructorInject().
+                name("id").
+                value(1001).
+                primitiveValue().
+                build();
         Cookbook cookbook = createCookbook(createRecipe("bank", "product.Bank", injector));
 
         ioc.setCookbook(cookbook);
@@ -56,9 +62,13 @@ public class ConstructorInjectorTest {
 
     @Test
     public void should_create_object_with_constructor_determined_by_param_type() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
-        Injector injector = getConstructorInjector("name", "Bank of Beijing", ReferenceType.Primitivity);
+        Injector injector = new InjectorBuilder().
+                constructorInject().
+                name("name").
+                value("Bank of Beijing").
+                primitiveValue().
+                build();
         Cookbook cookbook = createCookbook(createRecipe("bank", "product.Bank", injector));
-
         ioc.setCookbook(cookbook);
 
         Bank bank = (Bank) ioc.lookUp("bank");

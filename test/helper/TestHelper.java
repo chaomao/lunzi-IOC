@@ -5,22 +5,6 @@ import parser.result.*;
 import java.util.Arrays;
 
 public class TestHelper {
-    public static Injector getConstructorInjector(String name, Object value, ReferenceType referenceType) {
-        return getInjector(InjectType.Constructor, name, value, referenceType);
-    }
-
-    public static Injector getSetterInjector(String name, Object value, ReferenceType referenceType) {
-        return getInjector(InjectType.Setter, name, value, referenceType);
-    }
-
-    private static Injector getInjector(InjectType type, String name, Object value, ReferenceType referenceType) {
-        Injector injector = new Injector();
-        injector.setInjectType(type);
-        injector.setName(name);
-        injector.setValue(value);
-        injector.setIsReference(referenceType);
-        return injector;
-    }
 
     public static Cookbook createCookbook(Recipe... recipes) {
         Cookbook cookbook = new Cookbook();
