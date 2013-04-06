@@ -12,6 +12,10 @@
         <injector name="amountList" type="set" value="1234"/>
     </object>
 
+    <object name="definedByValueType">
+        <injector name="id" value="1002" valueType="java.lang.Integer"/>
+    </object>
+
     <object name="user" class="User">
         <injector name="bank" ref="saving"/>
     </object>
