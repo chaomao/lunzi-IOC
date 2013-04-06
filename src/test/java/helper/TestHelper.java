@@ -1,6 +1,8 @@
 package helper;
 
-import parser.result.*;
+import parser.result.Cookbook;
+import parser.result.Injector;
+import parser.result.Recipe;
 
 import java.util.Arrays;
 

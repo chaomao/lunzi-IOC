@@ -1,16 +1,18 @@
+import helper.TestHelper;
+import org.hamcrest.CoreMatchers;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import parser.InjectorBuilder;
 import parser.result.Cookbook;
 import parser.result.Injector;
-import parser.result.ReferenceType;
 import product.Bank;
 
 import java.lang.reflect.InvocationTargetException;
 
-import static helper.TestHelper.*;
+import static helper.TestHelper.createCookbook;
+import static helper.TestHelper.createRecipe;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 public class ConstructorInjectorTest {
@@ -40,7 +42,7 @@ public class ConstructorInjectorTest {
         Object bank1 = ioc.lookUp("bank");
         Object bank2 = ioc.lookUp("bank");
 
-        assertEquals(bank1, bank2);
+        Assert.assertEquals(bank1, bank2);
     }
 
     @Test

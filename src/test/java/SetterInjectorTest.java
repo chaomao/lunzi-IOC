@@ -3,14 +3,15 @@ import org.junit.Test;
 import parser.InjectorBuilder;
 import parser.result.Cookbook;
 import parser.result.Injector;
-import parser.result.ReferenceType;
 import product.Bank;
 
 import java.lang.reflect.InvocationTargetException;
 
-import static helper.TestHelper.*;
+import static helper.TestHelper.createCookbook;
+import static helper.TestHelper.createRecipe;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class SetterInjectorTest {
     private ReinventedIOC ioc;
