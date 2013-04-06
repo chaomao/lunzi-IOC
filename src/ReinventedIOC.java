@@ -1,5 +1,6 @@
 import finder.ConstructorFinder;
 import parser.result.Cookbook;
+import parser.result.Injector;
 import parser.result.Recipe;
 
 import java.lang.reflect.InvocationTargetException;
@@ -17,13 +18,39 @@ public class ReinventedIOC {
         if (objectMap.containsKey(name)) {
             return objectMap.get(name);
         } else {
-            Object o = chef.cook(recipe);
+            Recipe newRecipe = consolidateReferenceInjector(recipe);
+            Object o = chef.cook(newRecipe);
             objectMap.put(name, o);
             return o;
         }
     }
 
+    private Recipe consolidateReferenceInjector(Recipe recipe) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        Iterable<Injector> referenceInjectors = recipe.getReferenceInjectors();
+        for (Injector injector : referenceInjectors) {
+            Object o = getReferenceInjectorValue(injector);
+            injector.setValue(o);
+        }
+        return recipe;
+    }
+
+    private Object getReferenceInjectorValue(Injector injector) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+        String recipeName = (String) injector.getValue();
+        Recipe referenceRecipe = cookbook.findRecipe(recipeName);
+        String referenceRecipeName = referenceRecipe.getName();
+        if (objectMap.containsKey(referenceRecipeName)) {
+            return objectMap.get(referenceRecipeName);
+        }
+        else {
+            return lookUp(referenceRecipeName);
+        }
+    }
+
     public void setCookbook(Cookbook cookbook) {
         this.cookbook = cookbook;
+    }
+
+    public int getObjectCount(){
+        return objectMap.size();
     }
 }

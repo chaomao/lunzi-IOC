@@ -74,4 +74,13 @@ public class Recipe {
         });
     }
 
+    public Iterable<Injector> getReferenceInjectors() {
+        return filter(injectorList, new Predicate<Injector>() {
+            @Override
+            @Nullable
+            public boolean apply(Injector injector) {
+                return injector.getIsReference();
+            }
+        });
+    }
 }
