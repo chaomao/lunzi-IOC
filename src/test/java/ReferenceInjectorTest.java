@@ -1,5 +1,8 @@
+import exception.LoopDependencyException;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import parser.InjectorBuilder;
 import parser.result.Cookbook;
 import parser.result.Injector;
@@ -15,6 +18,8 @@ import static org.junit.Assert.assertThat;
 
 public class ReferenceInjectorTest {
 
+    @Rule
+    public ExpectedException expectedEx = ExpectedException.none();
     private ReinventedIOC ioc;
 
     @Before
@@ -98,5 +103,29 @@ public class ReferenceInjectorTest {
 
         Bank bank = (Bank) ioc.lookUp("beijingBank");
         assertThat(user.getBank(), is(bank));
+    }
+
+    @Test
+    public void should_throw_exception_when_loop_dependency_happen() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+        expectedEx.expect(LoopDependencyException.class);
+
+        Injector injectorOne = new InjectorBuilder().
+                constructorInject().
+                name("objectOne").
+                value("one").
+                referenceValue().
+                build();
+        Injector injectorTwo = new InjectorBuilder().
+                constructorInject().
+                name("objectTwo").
+                value("two").
+                referenceValue().
+                build();
+        Cookbook cookbook = createCookbook(
+                createRecipe("one", "helper.ObjectOne", injectorTwo),
+                createRecipe("two", "helper.ObjectTwo", injectorOne));
+        ioc.setCookbook(cookbook);
+
+        ioc.lookUp("one");
     }
 }
