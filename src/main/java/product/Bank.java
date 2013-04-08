@@ -3,7 +3,6 @@ package product;
 public class Bank {
 
     private int id;
-
     private String name;
     private int amount;
 

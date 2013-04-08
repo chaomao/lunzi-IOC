@@ -31,7 +31,6 @@ public class Chef {
             Method setter = o.getClass().getDeclaredMethod(setterName, injector.getValue().getClass());
             setter.invoke(o, injector.getValue());
         }
-
         return o;
     }
 }

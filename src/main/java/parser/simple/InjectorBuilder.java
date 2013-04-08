@@ -1,4 +1,4 @@
-package parser;
+package parser.simple;
 
 import parser.result.InjectType;
 import parser.result.Injector;

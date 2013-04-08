@@ -1,46 +1,44 @@
-import helper.TestHelper;
-import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import parser.InjectorBuilder;
 import parser.result.Cookbook;
 import parser.result.Injector;
+import parser.simple.InjectorBuilder;
 import product.Bank;
 
 import java.lang.reflect.InvocationTargetException;
 
-import static helper.TestHelper.createCookbook;
-import static helper.TestHelper.createRecipe;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static parser.result.Cookbook.createByRecipes;
+import static parser.simple.SimpleParser.createRecipe;
 
 public class ConstructorInjectorTest {
 
-    private ReinventedIOC ioc;
+    private Kitchen kitchen;
 
     @Before
     public void setUp() throws Exception {
-        ioc = new ReinventedIOC();
+        kitchen = new Kitchen();
     }
 
     @Test
     public void should_create_object_given_name_class_only() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
-        Cookbook cookbook = createCookbook(createRecipe("bank", "product.Bank"));
-        ioc.setCookbook(cookbook);
+        Cookbook cookbook = createByRecipes(createRecipe("bank", "product.Bank"));
+        kitchen.setCookbook(cookbook);
 
-        Bank bank = (Bank) ioc.lookUp("bank");
+        Bank bank = (Bank) kitchen.lookUp("bank");
 
         assertThat(bank.verify(), is("success"));
     }
 
     @Test
     public void should_not_create_object_twice_when_object_created() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
-        Cookbook cookbook = createCookbook(createRecipe("bank", "product.Bank"));
-        ioc.setCookbook(cookbook);
+        Cookbook cookbook = createByRecipes(createRecipe("bank", "product.Bank"));
+        kitchen.setCookbook(cookbook);
 
-        Object bank1 = ioc.lookUp("bank");
-        Object bank2 = ioc.lookUp("bank");
+        Object bank1 = kitchen.lookUp("bank");
+        Object bank2 = kitchen.lookUp("bank");
 
         Assert.assertEquals(bank1, bank2);
     }
@@ -53,11 +51,11 @@ public class ConstructorInjectorTest {
                 value(1001).
                 primitiveValue().
                 build();
-        Cookbook cookbook = createCookbook(createRecipe("bank", "product.Bank", injector));
+        Cookbook cookbook = createByRecipes(createRecipe("bank", "product.Bank", injector));
 
-        ioc.setCookbook(cookbook);
+        kitchen.setCookbook(cookbook);
 
-        Bank bank = (Bank) ioc.lookUp("bank");
+        Bank bank = (Bank) kitchen.lookUp("bank");
 
         assertThat(bank.getId(), is(1001));
     }
@@ -70,10 +68,10 @@ public class ConstructorInjectorTest {
                 value("Bank of Beijing").
                 primitiveValue().
                 build();
-        Cookbook cookbook = createCookbook(createRecipe("bank", "product.Bank", injector));
-        ioc.setCookbook(cookbook);
+        Cookbook cookbook = createByRecipes(createRecipe("bank", "product.Bank", injector));
+        kitchen.setCookbook(cookbook);
 
-        Bank bank = (Bank) ioc.lookUp("bank");
+        Bank bank = (Bank) kitchen.lookUp("bank");
 
         assertThat(bank.getName(), is("Bank of Beijing"));
     }

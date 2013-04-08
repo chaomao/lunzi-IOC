@@ -1,7 +1,6 @@
 package finder;
 
 import com.google.common.collect.Lists;
-import parser.result.Recipe;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;

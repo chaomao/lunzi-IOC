@@ -14,10 +14,6 @@ public class Recipe {
     private String klass;
     private List<Injector> injectorList = new ArrayList<Injector>();
 
-    public List<Injector> getInjectorList() {
-        return injectorList;
-    }
-
     public void setInjectorList(List<Injector> injectorList) {
         this.injectorList = injectorList;
     }
@@ -36,16 +32,6 @@ public class Recipe {
 
     public void setKlass(String klass) {
         this.klass = klass;
-    }
-
-    public int getConstructorInjectorCount() {
-        return size(filter(injectorList, new Predicate<Injector>() {
-            @Override
-            @Nullable
-            public boolean apply(Injector injector) {
-                return injector.isConstructorInjector();
-            }
-        }));
     }
 
     public Iterable<Object> getConstructorInjectorValues() {

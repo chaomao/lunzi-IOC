@@ -3,6 +3,7 @@ package parser;
 import org.junit.Test;
 import parser.result.InjectType;
 import parser.result.Injector;
+import parser.simple.InjectorBuilder;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;

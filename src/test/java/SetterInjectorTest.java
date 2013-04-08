@@ -1,24 +1,23 @@
 import org.junit.Before;
 import org.junit.Test;
-import parser.InjectorBuilder;
 import parser.result.Cookbook;
 import parser.result.Injector;
+import parser.simple.InjectorBuilder;
 import product.Bank;
 
 import java.lang.reflect.InvocationTargetException;
 
-import static helper.TestHelper.createCookbook;
-import static helper.TestHelper.createRecipe;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static parser.result.Cookbook.createByRecipes;
+import static parser.simple.SimpleParser.createRecipe;
 
 public class SetterInjectorTest {
-    private ReinventedIOC ioc;
+    private Kitchen kitchen;
 
     @Before
     public void setUp() throws Exception {
-        ioc = new ReinventedIOC();
+        kitchen = new Kitchen();
     }
 
     @Test
@@ -29,10 +28,10 @@ public class SetterInjectorTest {
                 value(123).
                 primitiveValue().
                 build();
-        Cookbook cookbook = createCookbook(createRecipe("bank", "product.Bank", injector));
-        ioc.setCookbook(cookbook);
+        Cookbook cookbook = createByRecipes(createRecipe("bank", "product.Bank", injector));
+        kitchen.setCookbook(cookbook);
 
-        Bank bank = (Bank) ioc.lookUp("bank");
+        Bank bank = (Bank) kitchen.lookUp("bank");
 
         assertThat(bank.getAmount(), is(123));
     }
@@ -52,10 +51,10 @@ public class SetterInjectorTest {
                 value(123).
                 primitiveValue().
                 build();
-        Cookbook cookbook = createCookbook(createRecipe("bank", "product.Bank", setterInjector, constructorInjector));
-        ioc.setCookbook(cookbook);
+        Cookbook cookbook = createByRecipes(createRecipe("bank", "product.Bank", setterInjector, constructorInjector));
+        kitchen.setCookbook(cookbook);
 
-        Bank bank = (Bank) ioc.lookUp("bank");
+        Bank bank = (Bank) kitchen.lookUp("bank");
 
         assertThat(bank.getName(), is("Bank of Beijing"));
         assertThat(bank.getAmount(), is(123));
