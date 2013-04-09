@@ -108,6 +108,7 @@ public class ReferenceInjectorTest {
     @Test
     public void should_throw_exception_when_loop_dependency_happen() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         expectedEx.expect(LoopDependencyException.class);
+        expectedEx.expectMessage("There is loop dependency happens for object one");
 
         Injector injectorOne = new InjectorBuilder().
                 constructorInject().
@@ -121,9 +122,16 @@ public class ReferenceInjectorTest {
                 value("two").
                 referenceValue().
                 build();
+        Injector injectorThree = new InjectorBuilder().
+                constructorInject().
+                name("objectThree").
+                value("three").
+                referenceValue().
+                build();
         Cookbook cookbook = createByRecipes(
                 createRecipe("one", "helper.ObjectOne", injectorTwo),
-                createRecipe("two", "helper.ObjectTwo", injectorOne));
+                createRecipe("two", "helper.ObjectTwo", injectorThree),
+                createRecipe("three", "helper.ObjectThree", injectorOne));
         kitchen.setCookbook(cookbook);
 
         kitchen.lookUp("one");

@@ -38,7 +38,7 @@ public class Kitchen {
 
     private Recipe findRecipe(String recipeName) {
         if (objectInProcess.contains(recipeName)) {
-            throw new LoopDependencyException();
+            throw new LoopDependencyException("There is loop dependency happens for object " + recipeName);
         }
         objectInProcess.push(recipeName);
         return cookbook.findRecipe(recipeName);

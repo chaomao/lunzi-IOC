@@ -1,9 +1,9 @@
 package helper;
 
 public class ObjectTwo {
-    private ObjectOne one;
+    private ObjectThree three;
 
-    public ObjectTwo(ObjectOne one) {
-        this.one = one;
+    public ObjectTwo(ObjectThree three) {
+        this.three = three;
     }
 }
