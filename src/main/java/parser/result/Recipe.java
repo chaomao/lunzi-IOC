@@ -6,7 +6,8 @@ import com.google.common.base.Predicate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.google.common.collect.Iterables.*;
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.transform;
 
 public class Recipe {
     private String name;
@@ -63,5 +64,17 @@ public class Recipe {
                 return injector.getIsReference();
             }
         });
+    }
+
+    public boolean isPresent() {
+        return true;
+    }
+}
+
+class NullRecipe extends Recipe {
+
+    @Override
+    public boolean isPresent() {
+        return false;
     }
 }

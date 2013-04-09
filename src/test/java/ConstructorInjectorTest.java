@@ -25,7 +25,7 @@ public class ConstructorInjectorTest {
     @Test
     public void should_create_object_given_name_class_only() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         Cookbook cookbook = createByRecipes(createRecipe("bank", "product.Bank"));
-        kitchen.setCookbook(cookbook);
+        kitchen.addCookbook(cookbook);
 
         Bank bank = (Bank) kitchen.lookUp("bank");
 
@@ -35,7 +35,7 @@ public class ConstructorInjectorTest {
     @Test
     public void should_not_create_object_twice_when_object_created() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         Cookbook cookbook = createByRecipes(createRecipe("bank", "product.Bank"));
-        kitchen.setCookbook(cookbook);
+        kitchen.addCookbook(cookbook);
 
         Object bank1 = kitchen.lookUp("bank");
         Object bank2 = kitchen.lookUp("bank");
@@ -53,7 +53,7 @@ public class ConstructorInjectorTest {
                 build();
         Cookbook cookbook = createByRecipes(createRecipe("bank", "product.Bank", injector));
 
-        kitchen.setCookbook(cookbook);
+        kitchen.addCookbook(cookbook);
 
         Bank bank = (Bank) kitchen.lookUp("bank");
 
@@ -69,7 +69,7 @@ public class ConstructorInjectorTest {
                 primitiveValue().
                 build();
         Cookbook cookbook = createByRecipes(createRecipe("bank", "product.Bank", injector));
-        kitchen.setCookbook(cookbook);
+        kitchen.addCookbook(cookbook);
 
         Bank bank = (Bank) kitchen.lookUp("bank");
 

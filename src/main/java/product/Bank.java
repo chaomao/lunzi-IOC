@@ -10,6 +10,10 @@ public class Bank {
 
     }
 
+    public Bank(City city) {
+
+    }
+
     public Bank(int id) {
         this.id = id;
     }

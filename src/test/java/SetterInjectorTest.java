@@ -29,7 +29,7 @@ public class SetterInjectorTest {
                 primitiveValue().
                 build();
         Cookbook cookbook = createByRecipes(createRecipe("bank", "product.Bank", injector));
-        kitchen.setCookbook(cookbook);
+        kitchen.addCookbook(cookbook);
 
         Bank bank = (Bank) kitchen.lookUp("bank");
 
@@ -52,7 +52,7 @@ public class SetterInjectorTest {
                 primitiveValue().
                 build();
         Cookbook cookbook = createByRecipes(createRecipe("bank", "product.Bank", setterInjector, constructorInjector));
-        kitchen.setCookbook(cookbook);
+        kitchen.addCookbook(cookbook);
 
         Bank bank = (Bank) kitchen.lookUp("bank");
 

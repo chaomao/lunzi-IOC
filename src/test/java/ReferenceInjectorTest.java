@@ -44,7 +44,7 @@ public class ReferenceInjectorTest {
         Cookbook cookbook = createByRecipes(
                 createRecipe("beijingBank", "product.Bank", injector),
                 createRecipe("user", "product.User", referenceInjector));
-        kitchen.setCookbook(cookbook);
+        kitchen.addCookbook(cookbook);
 
         Bank bank = (Bank) kitchen.lookUp("beijingBank");
         assertThat(kitchen.getObjectCount(), is(1));
@@ -70,7 +70,7 @@ public class ReferenceInjectorTest {
         Cookbook cookbook = createByRecipes(
                 createRecipe("beijingBank", "product.Bank", injector),
                 createRecipe("user", "product.User", referenceInjector));
-        kitchen.setCookbook(cookbook);
+        kitchen.addCookbook(cookbook);
 
         User user = (User) kitchen.lookUp("user");
         assertThat(kitchen.getObjectCount(), is(2));
@@ -96,7 +96,7 @@ public class ReferenceInjectorTest {
         Cookbook cookbook = createByRecipes(
                 createRecipe("beijingBank", "product.Bank", injector),
                 createRecipe("user", "product.User", referenceInjector));
-        kitchen.setCookbook(cookbook);
+        kitchen.addCookbook(cookbook);
 
         User user = (User) kitchen.lookUp("user");
         assertThat(kitchen.getObjectCount(), is(2));
@@ -132,7 +132,7 @@ public class ReferenceInjectorTest {
                 createRecipe("one", "helper.ObjectOne", injectorTwo),
                 createRecipe("two", "helper.ObjectTwo", injectorThree),
                 createRecipe("three", "helper.ObjectThree", injectorOne));
-        kitchen.setCookbook(cookbook);
+        kitchen.addCookbook(cookbook);
 
         kitchen.lookUp("one");
     }

@@ -16,7 +16,7 @@ public class ReinventedIOC {
 
     private static Kitchen setupKitchen() {
         Kitchen kitchen = new Kitchen();
-        kitchen.setCookbook(Cookbook.createByRecipes(getParser().getRecipes()));
+        kitchen.addCookbook(Cookbook.createByRecipes(getParser().getRecipes()));
         return kitchen;
     }
 

@@ -1,28 +1,47 @@
+import com.google.common.base.Predicate;
 import exception.LoopDependencyException;
 import parser.result.Cookbook;
 import parser.result.Injector;
 import parser.result.Recipe;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Stack;
+
+import static com.google.common.collect.Iterables.find;
 
 public class Kitchen {
 
     private final Chef chef = new Chef();
-    private Cookbook cookbook = new Cookbook();
+    private ArrayList<Cookbook> cookbooks = new ArrayList<Cookbook>();
     private HashMap<String, Object> objectMap = new HashMap<String, Object>();
     private Stack<String> objectInProcess = new Stack<String>();
 
-    public Object lookUp(String recipeName) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        Recipe recipe = findRecipe(recipeName);
+    private Object lookUpInCookBook(String recipeName, Cookbook cookbook) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        Recipe recipe = findRecipe(recipeName, cookbook);
+        return returnNewObject(recipeName, recipe, cookbook);
+    }
+
+    public Object lookUp(final String recipeName) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         if (objectMap.containsKey(recipeName)) {
-            return returnObjectFromContainer(recipeName);
+            return objectMap.get(recipeName);
         } else {
-            Recipe consolidatedRecipe = consolidateReferenceInjector(recipe);
-            Object newObject = chef.cook(consolidatedRecipe);
-            return pushNewObjectInContainer(recipeName, newObject);
+            Cookbook cookbook = find(cookbooks, new Predicate<Cookbook>() {
+                @Override
+                public boolean apply(Cookbook cookbook) {
+                    return cookbook.findRecipe(recipeName).isPresent();
+                }
+            });
+            return lookUpInCookBook(recipeName, cookbook);
         }
+    }
+
+    private Object returnNewObject(String recipeName, Recipe recipe, Cookbook cookbook) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
+        Recipe consolidatedRecipe = consolidateReferenceInjector(recipe, cookbook);
+        Object newObject = chef.cook(consolidatedRecipe);
+        return pushNewObjectInContainer(recipeName, newObject);
     }
 
     private Object pushNewObjectInContainer(String name, Object o) {
@@ -31,41 +50,37 @@ public class Kitchen {
         return o;
     }
 
-    private Object returnObjectFromContainer(String name) {
-        objectInProcess.pop();
-        return objectMap.get(name);
-    }
-
-    private Recipe findRecipe(String recipeName) {
+    private Recipe findRecipe(String recipeName, Cookbook cookbook) {
         if (objectInProcess.contains(recipeName)) {
             throw new LoopDependencyException("There is loop dependency happens for object " + recipeName);
+        } else {
+            objectInProcess.push(recipeName);
         }
-        objectInProcess.push(recipeName);
         return cookbook.findRecipe(recipeName);
     }
 
-    private Recipe consolidateReferenceInjector(Recipe recipe) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
+    private Recipe consolidateReferenceInjector(Recipe recipe, Cookbook cookbook) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
         Iterable<Injector> referenceInjectors = recipe.getReferenceInjectors();
         for (Injector injector : referenceInjectors) {
-            Object o = getReferenceInjectorValue(injector);
+            Object o = getReferenceInjectorValue(injector, cookbook);
             injector.setValue(o);
         }
         return recipe;
     }
 
-    private Object getReferenceInjectorValue(Injector injector) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
+    private Object getReferenceInjectorValue(Injector injector, Cookbook cookbook) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
         String recipeName = (String) injector.getValue();
         Recipe referenceRecipe = cookbook.findRecipe(recipeName);
         String referenceRecipeName = referenceRecipe.getName();
         if (objectMap.containsKey(referenceRecipeName)) {
             return objectMap.get(referenceRecipeName);
         } else {
-            return lookUp(referenceRecipeName);
+            return lookUpInCookBook(referenceRecipeName, cookbook);
         }
     }
 
-    public void setCookbook(Cookbook cookbook) {
-        this.cookbook = cookbook;
+    public void addCookbook(Cookbook... cookbooks) {
+        this.cookbooks.addAll(Arrays.asList(cookbooks));
     }
 
     public int getObjectCount() {
