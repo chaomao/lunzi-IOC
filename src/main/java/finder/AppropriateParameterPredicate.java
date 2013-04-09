@@ -2,7 +2,6 @@ package finder;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.sun.istack.internal.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
@@ -28,7 +27,6 @@ public class AppropriateParameterPredicate implements Predicate<Constructor> {
     }
 
     @Override
-    @Nullable
     public boolean apply(final Constructor constructor) {
         Iterable<Class> parameterClasses = getWrapperParameterClasses(constructor.getParameterTypes());
         for (int i = 0; i < size(parameterClasses); i++) {
@@ -42,7 +40,6 @@ public class AppropriateParameterPredicate implements Predicate<Constructor> {
     private Iterable<Class> getWrapperParameterClasses(final Class[] parameterTypes) {
         return transform(Arrays.asList(parameterTypes), new Function<Class, Class>() {
             @Override
-            @Nullable
             public Class apply(Class klass) {
                 return CLASS_HASH_MAP.containsKey(klass) ? CLASS_HASH_MAP.get(klass) : klass;
             }

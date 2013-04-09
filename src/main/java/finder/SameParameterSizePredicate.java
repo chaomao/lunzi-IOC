@@ -1,7 +1,6 @@
 package finder;
 
 import com.google.common.base.Predicate;
-import com.sun.istack.internal.Nullable;
 
 import java.lang.reflect.Constructor;
 
@@ -16,7 +15,6 @@ public class SameParameterSizePredicate implements Predicate<Constructor> {
     }
 
     @Override
-    @Nullable
     public boolean apply(Constructor constructor) {
         return size(constructorValues) == constructor.getParameterTypes().length;
     }
