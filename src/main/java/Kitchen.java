@@ -14,22 +14,34 @@ public class Kitchen {
     private HashMap<String, Object> objectMap = new HashMap<String, Object>();
     private Stack<String> objectInProcess = new Stack<String>();
 
-    public Object lookUp(String name) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        if (objectInProcess.contains(name)) {
+    public Object lookUp(String recipeName) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        Recipe recipe = findRecipe(recipeName);
+        if (objectMap.containsKey(recipeName)) {
+            return returnObjectFromContainer(recipeName);
+        } else {
+            Recipe consolidatedRecipe = consolidateReferenceInjector(recipe);
+            Object newObject = chef.cook(consolidatedRecipe);
+            return pushNewObjectInContainer(recipeName, newObject);
+        }
+    }
+
+    private Object pushNewObjectInContainer(String name, Object o) {
+        objectMap.put(name, o);
+        objectInProcess.pop();
+        return o;
+    }
+
+    private Object returnObjectFromContainer(String name) {
+        objectInProcess.pop();
+        return objectMap.get(name);
+    }
+
+    private Recipe findRecipe(String recipeName) {
+        if (objectInProcess.contains(recipeName)) {
             throw new LoopDependencyException();
         }
-        objectInProcess.push(name);
-        Recipe recipe = cookbook.findRecipe(name);
-        if (objectMap.containsKey(name)) {
-            objectInProcess.pop();
-            return objectMap.get(name);
-        } else {
-            Recipe newRecipe = consolidateReferenceInjector(recipe);
-            Object o = chef.cook(newRecipe);
-            objectMap.put(name, o);
-            objectInProcess.pop();
-            return o;
-        }
+        objectInProcess.push(recipeName);
+        return cookbook.findRecipe(recipeName);
     }
 
     private Recipe consolidateReferenceInjector(Recipe recipe) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
