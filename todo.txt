@@ -1,0 +1,13 @@
+1.parent container
+
+Container parent = new Container();
+Container sub = new Container(parent);
+sub can use all object in parent container.
+
+2. xml parser
+
+
+3.auto wire object
+we don't need add another injector and we can still get object if necessary object in container
+
+
