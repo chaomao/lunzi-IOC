@@ -1,0 +1,18 @@
+package com.thoughtworks.row.ioc.beans;
+
+public class FrankConsumer implements ServiceConsumer{
+    private Service service;
+
+    public FrankConsumer(Service service) {
+        this.service = service;
+    }
+
+    public Service getService() {
+        return service;
+    }
+
+    @Override
+    public String service() {
+        return service.service();
+    }
+}
