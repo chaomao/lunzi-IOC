@@ -1,5 +1,4 @@
 import com.google.common.collect.Iterables;
-import com.sun.xml.internal.ws.util.StringUtils;
 import finder.ConstructorFinder;
 import parser.result.Injector;
 import parser.result.Recipe;
@@ -27,10 +26,14 @@ public class Chef {
     private Object populateObject(Recipe recipe, Object o) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Iterable<Injector> injectors = recipe.getSetterInjectors();
         for (Injector injector : injectors) {
-            String setterName = "set" + StringUtils.capitalize(injector.getName());
+            String setterName = "set" + capitalize(injector.getName());
             Method setter = o.getClass().getDeclaredMethod(setterName, injector.getValue().getClass());
             setter.invoke(o, injector.getValue());
         }
         return o;
+    }
+
+    private String capitalize(String line) {
+        return Character.toUpperCase(line.charAt(0)) + line.substring(1);
     }
 }
