@@ -55,9 +55,13 @@ public class Container {
         if (isMultipleConstructor(constructors)) {
             throw new MultipleConstructorsException();
         }
-        return constructors[0].getParameterTypes().length != 0 ?
+        return hasUserDefinedConstructor(constructors[0]) ?
                 new ConstructorComponentProvider(this, serviceClass) :
                 new SetterComponentProvider(this, serviceClass);
+    }
+
+    private boolean hasUserDefinedConstructor(Constructor<?> constructor) {
+        return constructor.getParameterTypes().length != 0;
     }
 
     private boolean isMultipleConstructor(Constructor<?>[] constructors) {
