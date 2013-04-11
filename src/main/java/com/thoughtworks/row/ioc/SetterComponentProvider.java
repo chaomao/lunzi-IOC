@@ -2,6 +2,7 @@ package com.thoughtworks.row.ioc;
 
 import com.thoughtworks.row.ioc.exception.CyclicDependencyException;
 import com.thoughtworks.row.ioc.exception.MultipleSetterException;
+import com.thoughtworks.row.ioc.exception.SetComponentException;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -28,7 +29,12 @@ class SetterComponentProvider implements ComponentProvider {
             throw new CyclicDependencyException();
         }
         buildPath.push(componentClass);
-        Constructor constructor = componentClass.getConstructors()[0];
+        Object target = setTargetObject(componentClass.getConstructors()[0], buildPath);
+        buildPath.pop();
+        return target;
+    }
+
+    private Object setTargetObject(Constructor constructor, Stack<Class> buildPath) {
         try {
             Object target = constructor.newInstance();
             BeanInfo beanInfo = Introspector.getBeanInfo(componentClass);
@@ -43,10 +49,8 @@ class SetterComponentProvider implements ComponentProvider {
                 }
             }
             return target;
-        } catch (InvocationTargetException | InstantiationException | IllegalAccessException | IntrospectionException e) {
-        } finally {
-            buildPath.pop();
+        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | IntrospectionException e) {
+            throw new SetComponentException();
         }
-        return null;
     }
 }
