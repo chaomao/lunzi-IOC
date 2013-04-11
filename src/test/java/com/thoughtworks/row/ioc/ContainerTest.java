@@ -57,10 +57,10 @@ public class ContainerTest {
     @Test
     public void should_be_able_to_declare_service_lifecycle() {
         container.register(Service.class, ServiceImplementation.class, Lifecycle.Singleton);
-        container.register(ServiceConsumer.class, FrankConsumer.class, Lifecycle.Transient);
+        container.register(ServiceConsumer.class, TransientServiceConsumer.class, Lifecycle.Transient);
 
-        FrankConsumer first = (FrankConsumer) container.get(ServiceConsumer.class);
-        FrankConsumer second = (FrankConsumer) container.get(ServiceConsumer.class);
+        TransientServiceConsumer first = (TransientServiceConsumer) container.get(ServiceConsumer.class);
+        TransientServiceConsumer second = (TransientServiceConsumer) container.get(ServiceConsumer.class);
 
         assertThat(first, not(sameInstance(second)));
         assertThat(first.getService(), sameInstance(second.getService()));

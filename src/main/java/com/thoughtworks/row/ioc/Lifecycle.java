@@ -6,9 +6,12 @@ public enum Lifecycle {
         public ComponentProvider getProvider(ComponentProvider provider) {
             return new CacheComponentProvider(provider);
         }
-    }, Transient;
+    }, Transient {
+        @Override
+        public ComponentProvider getProvider(ComponentProvider provider) {
+            return provider;
+        }
+    };
 
-    public ComponentProvider getProvider(ComponentProvider provider) {
-        return provider;
-    }
+    abstract public ComponentProvider getProvider(ComponentProvider provider);
 }

@@ -1,9 +1,9 @@
 package com.thoughtworks.row.ioc.beans;
 
-public class FrankConsumer implements ServiceConsumer{
+public class TransientServiceConsumer implements ServiceConsumer{
     private Service service;
 
-    public FrankConsumer(Service service) {
+    public TransientServiceConsumer(Service service) {
         this.service = service;
     }
 
