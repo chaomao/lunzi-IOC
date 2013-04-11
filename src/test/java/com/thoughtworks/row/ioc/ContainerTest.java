@@ -87,4 +87,30 @@ public class ContainerTest {
         ServiceConsumer consumer = son.get(ServiceConsumer.class);
         assertThat(consumer.service(), is(ServiceImplementation.class.getCanonicalName()));
     }
+
+    @Test(expected = ComponentNotFoundException.class)
+    public void should_throw_component_not_found_exception() {
+        container.register(ServiceConsumer.class, SetterConsumer.class);
+        container.get(Service.class);
+    }
+
+    @Test(expected = MultipleConstructorsException.class)
+    public void should_throw_multiple_constructors_exception_if_class_has_more_than_one_constructor() {
+        container.register(Service.class, MultipleConstructorsService.class);
+        container.get(Service.class);
+    }
+
+    @Test(expected = MultipleSetterException.class)
+    public void should_throw_multiple_setters_exception_if_class_has_more_than_three_setters() {
+        container.register(Service.class, ServiceImplementation.class);
+        container.register(ServiceConsumer.class, MultipleSetterServiceComsumer.class);
+        container.get(ServiceConsumer.class);
+    }
+
+    @Test(expected = MultipleParametersException.class)
+    public void should_throw_multiple_parameters_exception_if_constructor_has_more_than_three_parameters() {
+        container.register(Service.class, ServiceImplementation.class);
+        container.register(ServiceConsumer.class, MultipleParametersServiceConsumer.class);
+        container.get(ServiceConsumer.class);
+    }
 }

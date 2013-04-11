@@ -26,8 +26,7 @@ class ConstructorComponentProvider implements ComponentProvider {
         }
         buildPath.push(componentClass);
         Constructor constructor = componentClass.getConstructors()[0];
-        Class[] parameterTypes = constructor.getParameterTypes();
-        Iterable<Object> parameters = transform(Arrays.asList(parameterTypes), new Function<Class, Object>() {
+        Iterable<Object> parameters = transform(Arrays.asList(getParameterTypes(constructor)), new Function<Class, Object>() {
             @Override
             public Object apply(Class type) {
                 return container.createInstance(type, buildPath);
@@ -36,10 +35,17 @@ class ConstructorComponentProvider implements ComponentProvider {
         try {
             return constructor.newInstance(toArray(parameters, Object.class));
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
+            throw new CreateComponentException();
         } finally {
             buildPath.pop();
         }
-        return null;
+    }
+
+    private Class[] getParameterTypes(Constructor constructor) {
+        Class[] parameterTypes = constructor.getParameterTypes();
+        if (parameterTypes.length > 3) {
+            throw new MultipleParametersException();
+        }
+        return parameterTypes;
     }
 }

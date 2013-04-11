@@ -1,5 +1,6 @@
 package com.thoughtworks.row.ioc;
 
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Stack;
 
@@ -27,12 +28,16 @@ public class Container {
     }
 
     <T> T createInstance(Class<T> serviceInterface, final Stack<Class> buildPath) {
-        return (T) getProvider(serviceInterface).getInstance(buildPath);
+        ComponentProvider provider = getProvider(serviceInterface);
+        if (provider == null) {
+            throw new ComponentNotFoundException();
+        }
+        return (T) provider.getInstance(buildPath);
     }
 
     private <T> ComponentProvider getProvider(Class<T> serviceInterface) {
         ComponentProvider provider = providers.get(serviceInterface);
-        if (provider == null) {
+        if (provider == null && parentContainer != null) {
             provider = parentContainer.getProvider(serviceInterface);
         }
         return provider;
@@ -43,8 +48,16 @@ public class Container {
     }
 
     private <T> ComponentProvider getComponentProvider(Class<? extends T> serviceClass) {
-        return serviceClass.getDeclaredConstructors()[0].getParameterTypes().length != 0 ?
+        Constructor<?>[] constructors = serviceClass.getDeclaredConstructors();
+        if (isMultipleConstructor(constructors)) {
+            throw new MultipleConstructorsException();
+        }
+        return constructors[0].getParameterTypes().length != 0 ?
                 new ConstructorComponentProvider(this, serviceClass) :
                 new SetterComponentProvider(this, serviceClass);
+    }
+
+    private boolean isMultipleConstructor(Constructor<?>[] constructors) {
+        return constructors.length > 1;
     }
 }

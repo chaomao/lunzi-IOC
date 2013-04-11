@@ -10,6 +10,7 @@ import java.lang.reflect.Method;
 import java.util.Stack;
 
 class SetterComponentProvider implements ComponentProvider {
+    public static final int MAX_SETTER_LIMITATION = 3;
     private Container container;
     private Class componentClass;
 
@@ -28,7 +29,11 @@ class SetterComponentProvider implements ComponentProvider {
         try {
             Object target = constructor.newInstance();
             BeanInfo beanInfo = Introspector.getBeanInfo(componentClass);
-            for (PropertyDescriptor descriptor : beanInfo.getPropertyDescriptors()) {
+            PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
+            if (propertyDescriptors.length > MAX_SETTER_LIMITATION) {
+                throw new MultipleSetterException();
+            }
+            for (PropertyDescriptor descriptor : propertyDescriptors) {
                 Method setter = descriptor.getWriteMethod();
                 if (setter != null) {
                     setter.invoke(target, container.createInstance(descriptor.getPropertyType(), buildPath));
