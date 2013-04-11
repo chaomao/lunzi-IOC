@@ -9,7 +9,6 @@ import static org.junit.Assert.assertThat;
 
 public class ContainerTest {
 
-
     private Container container;
 
     @Before
