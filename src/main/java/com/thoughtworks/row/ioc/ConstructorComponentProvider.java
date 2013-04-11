@@ -28,20 +28,27 @@ class ConstructorComponentProvider implements ComponentProvider {
             throw new CyclicDependencyException();
         }
         buildPath.push(componentClass);
-        Constructor constructor = componentClass.getConstructors()[0];
-        Iterable<Object> parameters = transform(Arrays.asList(getParameterTypes(constructor)), new Function<Class, Object>() {
+        Object target = getObject(buildPath);
+        buildPath.pop();
+        return target;
+    }
+
+    private Object getObject(final Stack<Class> buildPath) {
+        try {
+            Constructor constructor = componentClass.getConstructors()[0];
+            return constructor.newInstance(toArray(getParameters(buildPath, constructor), Object.class));
+        } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            throw new CreateComponentException();
+        }
+    }
+
+    private Iterable<Object> getParameters(final Stack<Class> buildPath, Constructor constructor) {
+        return transform(Arrays.asList(getParameterTypes(constructor)), new Function<Class, Object>() {
             @Override
             public Object apply(Class type) {
                 return container.createInstance(type, buildPath);
             }
         });
-        try {
-            return constructor.newInstance(toArray(parameters, Object.class));
-        } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
-            throw new CreateComponentException();
-        } finally {
-            buildPath.pop();
-        }
     }
 
     private Class[] getParameterTypes(Constructor constructor) {

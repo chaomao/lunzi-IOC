@@ -4,7 +4,6 @@ import com.thoughtworks.row.ioc.exception.CyclicDependencyException;
 import com.thoughtworks.row.ioc.exception.MultipleSetterException;
 import com.thoughtworks.row.ioc.exception.SetComponentException;
 
-import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -29,28 +28,34 @@ class SetterComponentProvider implements ComponentProvider {
             throw new CyclicDependencyException();
         }
         buildPath.push(componentClass);
-        Object target = setTargetObject(componentClass.getConstructors()[0], buildPath);
+        Object target = getObject(componentClass.getConstructors()[0], buildPath);
         buildPath.pop();
         return target;
     }
 
-    private Object setTargetObject(Constructor constructor, Stack<Class> buildPath) {
+    private Object getObject(Constructor constructor, Stack<Class> buildPath) {
         try {
-            Object target = constructor.newInstance();
-            BeanInfo beanInfo = Introspector.getBeanInfo(componentClass);
-            PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
-            if (propertyDescriptors.length > MAX_SETTER_LIMITATION) {
-                throw new MultipleSetterException();
-            }
-            for (PropertyDescriptor descriptor : propertyDescriptors) {
-                Method setter = descriptor.getWriteMethod();
-                if (setter != null) {
-                    setter.invoke(target, container.createInstance(descriptor.getPropertyType(), buildPath));
-                }
-            }
-            return target;
+            return setObject(buildPath, constructor.newInstance());
         } catch (InstantiationException | InvocationTargetException | IllegalAccessException | IntrospectionException e) {
             throw new SetComponentException();
         }
+    }
+
+    private Object setObject(Stack<Class> buildPath, Object target) throws IntrospectionException, IllegalAccessException, InvocationTargetException {
+        for (PropertyDescriptor descriptor : getPropertyDescriptors()) {
+            Method setter = descriptor.getWriteMethod();
+            if (setter != null) {
+                setter.invoke(target, container.createInstance(descriptor.getPropertyType(), buildPath));
+            }
+        }
+        return target;
+    }
+
+    private PropertyDescriptor[] getPropertyDescriptors() throws IntrospectionException {
+        PropertyDescriptor[] propertyDescriptors = Introspector.getBeanInfo(componentClass).getPropertyDescriptors();
+        if (propertyDescriptors.length > MAX_SETTER_LIMITATION) {
+            throw new MultipleSetterException();
+        }
+        return propertyDescriptors;
     }
 }
