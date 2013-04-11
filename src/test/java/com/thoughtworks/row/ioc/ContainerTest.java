@@ -1,6 +1,7 @@
 package com.thoughtworks.row.ioc;
 
 import com.thoughtworks.row.ioc.beans.*;
+import com.thoughtworks.row.ioc.exception.*;
 import org.junit.Before;
 import org.junit.Test;
 

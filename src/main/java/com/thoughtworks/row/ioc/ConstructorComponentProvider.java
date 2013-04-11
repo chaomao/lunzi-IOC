@@ -1,6 +1,9 @@
 package com.thoughtworks.row.ioc;
 
 import com.google.common.base.Function;
+import com.thoughtworks.row.ioc.exception.CreateComponentException;
+import com.thoughtworks.row.ioc.exception.CyclicDependencyException;
+import com.thoughtworks.row.ioc.exception.MultipleParametersException;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

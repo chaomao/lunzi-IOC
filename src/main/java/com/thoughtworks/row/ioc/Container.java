@@ -1,5 +1,8 @@
 package com.thoughtworks.row.ioc;
 
+import com.thoughtworks.row.ioc.exception.ComponentNotFoundException;
+import com.thoughtworks.row.ioc.exception.MultipleConstructorsException;
+
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Stack;

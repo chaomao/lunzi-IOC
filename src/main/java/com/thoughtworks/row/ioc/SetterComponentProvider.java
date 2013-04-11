@@ -1,5 +1,8 @@
 package com.thoughtworks.row.ioc;
 
+import com.thoughtworks.row.ioc.exception.CyclicDependencyException;
+import com.thoughtworks.row.ioc.exception.MultipleSetterException;
+
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
