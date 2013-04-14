@@ -114,7 +114,7 @@ public class Container {
         }
     }
 
-    private Iterable<Class> getAllClasses(String packageName) throws IOException {
+    public Iterable<Class> getAllClasses(String packageName) throws IOException {
         ClassPath classPath = from(ClassLoader.getSystemClassLoader());
         Iterable<Class> allClasses = transform(classPath.getTopLevelClassesRecursive(packageName),
                 new Function<ClassInfo, Class>() {
