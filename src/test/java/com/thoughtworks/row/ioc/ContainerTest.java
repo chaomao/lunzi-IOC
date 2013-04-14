@@ -1,9 +1,15 @@
 package com.thoughtworks.row.ioc;
 
-import com.thoughtworks.row.ioc.beans.*;
+import com.thoughtworks.row.ioc.annotation.ComplexController;
+import com.thoughtworks.row.ioc.annotation.Controller;
+import com.thoughtworks.row.ioc.annotation.SimpleController;
+import com.thoughtworks.row.ioc.beans.bad.*;
+import com.thoughtworks.row.ioc.beans.good.*;
 import com.thoughtworks.row.ioc.exception.*;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.ArrayList;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
@@ -21,7 +27,7 @@ public class ContainerTest {
     public void should_be_able_to_create_instance_with_zero_constructor() {
         container.register(Service.class, ServiceImplementation.class);
 
-        Service service = container.get(Service.class);
+        Service service = (Service) container.get(Service.class);
         assertThat(service.service(), is(ServiceImplementation.class.getCanonicalName()));
     }
 
@@ -31,7 +37,7 @@ public class ContainerTest {
         container.register(ServiceConsumer.class, ServiceConsumerImplementation.class);
         container.register(Service.class, ServiceImplementation.class);
 
-        ServiceConsumer consumer = container.get(ServiceConsumer.class);
+        ServiceConsumer consumer = (ServiceConsumer) container.get(ServiceConsumer.class);
         assertThat(consumer.service(), is(ServiceImplementation.class.getCanonicalName()));
     }
 
@@ -50,7 +56,7 @@ public class ContainerTest {
         container.register(ServiceConsumer.class, ServiceConsumerImplementation.class);
         container.register(Service.class, PrivateService.getInstance());
 
-        ServiceConsumer consumer = container.get(ServiceConsumer.class);
+        ServiceConsumer consumer = (ServiceConsumer) container.get(ServiceConsumer.class);
         assertThat(consumer.service(), is(PrivateService.class.getCanonicalName()));
     }
 
@@ -71,7 +77,7 @@ public class ContainerTest {
         container.register(Service.class, ServiceImplementation.class);
         container.register(ServiceConsumer.class, SetterConsumer.class);
 
-        ServiceConsumer consumer = container.get(ServiceConsumer.class);
+        ServiceConsumer consumer = (ServiceConsumer) container.get(ServiceConsumer.class);
         assertThat(consumer.service(), is(ServiceImplementation.class.getCanonicalName()));
     }
 
@@ -84,7 +90,7 @@ public class ContainerTest {
         grandfather.register(Service.class, ServiceImplementation.class);
         son.register(ServiceConsumer.class, SetterConsumer.class);
 
-        ServiceConsumer consumer = son.get(ServiceConsumer.class);
+        ServiceConsumer consumer = (ServiceConsumer) son.get(ServiceConsumer.class);
         assertThat(consumer.service(), is(ServiceImplementation.class.getCanonicalName()));
     }
 
@@ -112,5 +118,30 @@ public class ContainerTest {
         container.register(Service.class, ServiceImplementation.class);
         container.register(ServiceConsumer.class, MultipleParametersServiceConsumer.class);
         container.get(ServiceConsumer.class);
+    }
+
+    @Test
+    public void should_get_component_when_register_by_package() {
+        container.registerComponentsInPackage("com.thoughtworks.row.ioc.annotation");
+        SimpleController simpleController = container.get(SimpleController.class);
+
+        assertThat(simpleController, notNullValue());
+    }
+
+    @Test
+    public void should_register_by_package() {
+        container.registerComponentsInPackage("com.thoughtworks.row.ioc.annotation");
+        container.register(Service.class, ServiceImplementation.class);
+
+        ArrayList<Object> controllers = container.getComponentsByAnnotation(Controller.class);
+
+        assertThat(controllers.size(), is(2));
+        assertThat(controllers, hasItem(isA(SimpleController.class)));
+        assertThat(controllers, hasItem(isA(ComplexController.class)));
+
+        ComplexController complexController = (ComplexController) (controllers.get(0) instanceof SimpleController ?
+                controllers.get(1) : controllers.get(0));
+
+        assertThat(complexController.service(), is(ServiceImplementation.class.getCanonicalName()));
     }
 }

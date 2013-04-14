@@ -1,4 +1,4 @@
-package com.thoughtworks.row.ioc.beans;
+package com.thoughtworks.row.ioc.beans.good;
 
 public class SetterConsumer implements ServiceConsumer {
     private Service service;
@@ -10,5 +10,9 @@ public class SetterConsumer implements ServiceConsumer {
     @Override
     public String service() {
         return service.service();
+    }
+
+    public class MyInnerClass {
+
     }
 }

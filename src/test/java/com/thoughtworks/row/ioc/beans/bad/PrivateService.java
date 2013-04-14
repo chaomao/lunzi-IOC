@@ -1,6 +1,8 @@
-package com.thoughtworks.row.ioc.beans;
+package com.thoughtworks.row.ioc.beans.bad;
 
-public class PrivateService implements Service{
+import com.thoughtworks.row.ioc.beans.good.Service;
+
+public class PrivateService implements Service {
     public static Service getInstance() {
         return new PrivateService();
     }

@@ -1,4 +1,6 @@
-package com.thoughtworks.row.ioc.beans;
+package com.thoughtworks.row.ioc.beans.bad;
+
+import com.thoughtworks.row.ioc.beans.good.Service;
 
 public class MultipleConstructorsService implements Service {
     private Service service;

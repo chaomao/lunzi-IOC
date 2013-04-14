@@ -1,4 +1,4 @@
-package com.thoughtworks.row.ioc.beans;
+package com.thoughtworks.row.ioc.beans.good;
 
 public class ServiceConsumerImplementation implements ServiceConsumer {
     private Service service;

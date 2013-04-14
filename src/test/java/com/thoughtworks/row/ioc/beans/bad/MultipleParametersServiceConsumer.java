@@ -1,4 +1,7 @@
-package com.thoughtworks.row.ioc.beans;
+package com.thoughtworks.row.ioc.beans.bad;
+
+import com.thoughtworks.row.ioc.beans.good.Service;
+import com.thoughtworks.row.ioc.beans.good.ServiceConsumer;
 
 public class MultipleParametersServiceConsumer implements ServiceConsumer {
 
