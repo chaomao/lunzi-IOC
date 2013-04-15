@@ -105,25 +105,25 @@ public class Container {
     }
 
     public void registerComponentsInPackage(String packageName) {
-        try {
-            for (Class klass : getAllClasses(packageName)) {
-                registerClassWithoutInterface(getRegisterKey(klass), klass);
-            }
-        } catch (IOException ignored) {
-            throw new RuntimeException();
+        for (Class klass : getAllClasses(packageName)) {
+            registerClassWithoutInterface(getRegisterKey(klass), klass);
         }
     }
 
-    public Iterable<Class> getAllClasses(String packageName) throws IOException {
-        ClassPath classPath = from(ClassLoader.getSystemClassLoader());
-        Iterable<Class> allClasses = transform(classPath.getTopLevelClassesRecursive(packageName),
-                new Function<ClassInfo, Class>() {
-                    @Override
-                    public Class apply(ClassInfo input) {
-                        return input.load();
-                    }
-                });
-        return filter(allClasses, new ClassOnlyPredicate());
+    public Iterable<Class> getAllClasses(String packageName) {
+        try {
+            ClassPath classPath = from(ClassLoader.getSystemClassLoader());
+            Iterable<Class> allClasses = transform(classPath.getTopLevelClassesRecursive(packageName),
+                    new Function<ClassInfo, Class>() {
+                        @Override
+                        public Class apply(ClassInfo input) {
+                            return input.load();
+                        }
+                    });
+            return filter(allClasses, new ClassOnlyPredicate());
+        } catch (IOException e) {
+            return null;
+        }
     }
 
     private Class getRegisterKey(Class klass) {
